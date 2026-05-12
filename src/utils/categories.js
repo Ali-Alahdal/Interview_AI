@@ -1,0 +1,22 @@
+export const COURSE_CATEGORIES = [
+    "Software Engineering",
+    "Frontend Development",
+    "Backend Development",
+    "Full Stack Development",
+    "Data Science",
+    "Machine Learning",
+    "Cybersecurity",
+    "Cloud Computing",
+    "DevOps",
+    "UI/UX Design",
+    "Product Management",
+    "Digital Marketing",
+    "Finance",
+    "Accounting",
+    "Business Administration",
+    "Human Resources",
+    "Sales",
+    "Customer Success",
+    "Medical & Healthcare",
+    "General Interview Prep"
+];
