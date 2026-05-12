@@ -254,7 +254,7 @@ export default function DashboardAdmin() {
 
                     {/* OVERVIEW TAB */}
                     <TabsContent value="overview" className="space-y-6">
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="glass-card rounded-xl p-4 glow-border">
                                 <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 text-blue-600"><Users className="w-5 h-5"/></div>
                                 <div className="text-2xl font-bold text-foreground mb-0.5">{loading ? "-" : users.length}</div>
@@ -264,16 +264,6 @@ export default function DashboardAdmin() {
                                 <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 text-emerald-400"><UserPlus className="w-5 h-5"/></div>
                                 <div className="text-2xl font-bold text-foreground mb-0.5">{loading ? "-" : requests.length}</div>
                                 <div className="text-xs font-medium text-foreground mb-0.5">Bekleyen Talepler</div>
-                            </div>
-                            <div className="glass-card rounded-xl p-4 glow-border">
-                                <div className="w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-3 text-cyan-400"><BookOpen className="w-5 h-5"/></div>
-                                <div className="text-2xl font-bold text-foreground mb-0.5">{loading ? "-" : courses.length}</div>
-                                <div className="text-xs font-medium text-foreground mb-0.5">Aktif Eğitimler</div>
-                            </div>
-                            <div className="glass-card rounded-xl p-4 glow-border">
-                                <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 text-amber-400"><Activity className="w-5 h-5"/></div>
-                                <div className="text-2xl font-bold text-foreground mb-0.5">100%</div>
-                                <div className="text-xs font-medium text-foreground mb-0.5">Sistem Durumu</div>
                             </div>
                         </div>
 

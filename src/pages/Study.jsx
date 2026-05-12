@@ -9,10 +9,10 @@ import { courseAPI } from "@/services/api";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Streamdown } from "streamdown";
+
 import {
-    Play, ChevronLeft, Clock, Layers, BookOpen, Mic,
-    ChevronRight, CheckCircle2, AlertCircle, Video, HelpCircle, Loader2
+    Play, ChevronLeft, Layers, BookOpen, Mic,
+    ChevronRight, CheckCircle2, AlertCircle, HelpCircle
 } from "lucide-react";
 
 function getYouTubeEmbedUrl(url) {
@@ -29,7 +29,7 @@ export default function Study() {
     const params = useParams();
     const [, navigate] = useLocation();
     const { selectedCourse, selectCourse } = useApp();
-    const [activeTab, setActiveTab] = useState("content");
+
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [course, setCourse] = useState(null);
     const [questions, setQuestions] = useState([]);
@@ -88,10 +88,7 @@ export default function Study() {
         }
     };
 
-    const tabs = [
-        { id: "content", label: "Ders İçeriği", icon: <BookOpen className="w-3.5 h-3.5" /> },
-        { id: "questions", label: `Mülakat Soruları (${questions.length})`, icon: <HelpCircle className="w-3.5 h-3.5" /> },
-    ];
+
 
     return (
         <DashboardLayout title={course.title}>
@@ -142,34 +139,13 @@ export default function Study() {
                             )}
                         </div>
 
-                        {/* Tab Switcher */}
-                        <div className="flex gap-1 p-1 rounded-xl bg-secondary w-fit border border-border">
-                            {tabs.map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                                        activeTab === tab.id
-                                            ? "bg-background text-foreground shadow-sm border border-border"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    }`}
-                                >
-                                    {tab.icon}
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Tab Content */}
-                        {activeTab === "content" ? (
-                            <div className="glass-card rounded-2xl border border-border p-6 lg:p-8">
-                                <div className="prose prose-invert prose-sm max-w-none">
-                                    <Streamdown>
-                                        {course.contentMaterial || course.content || "Bu ders için içerik materyali henüz yüklenmemiş."}
-                                    </Streamdown>
-                                </div>
-                            </div>
-                        ) : (
+                        {/* Questions List */}
+                        <div>
+                            <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                                <HelpCircle className="w-4 h-4 text-primary" />
+                                Mülakat Soruları
+                                <span className="ml-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">{questions.length}</span>
+                            </h3>
                             <div className="space-y-3">
                                 {questions.length === 0 ? (
                                     <div className="glass-card rounded-2xl border border-border p-10 text-center">
@@ -179,27 +155,17 @@ export default function Study() {
                                 ) : questions.map((q, i) => (
                                     <div key={q.id} className="glass-card rounded-xl border border-border p-5 hover:border-primary/30 transition-all duration-200">
                                         <div className="flex items-start gap-4">
-                                            <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-primary/20">
+                                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-primary/20">
                                                 <span className="text-xs font-bold text-primary">{i + 1}</span>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm text-foreground leading-relaxed font-medium">{q.content || q.text}</p>
-                                                <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                                                    {q.category && (
-                                                        <span className="px-2 py-0.5 rounded-md bg-secondary border border-border">{q.category}</span>
-                                                    )}
-                                                    <span className="flex items-center gap-1">
-                                                        <Clock className="w-3 h-3" />
-                                                        {Math.floor((q.timeLimit || 120) / 60)}:{String((q.timeLimit || 120) % 60).padStart(2, "0")} dk
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            <p className="text-sm text-foreground leading-relaxed font-medium">{q.content || q.text}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        )}
+                        </div>
                     </div>
+
 
                     {/* ── Sidebar ──────────────────────────────────── */}
                     <div className="space-y-5">
@@ -212,22 +178,15 @@ export default function Study() {
 
                             <div className="space-y-3">
                                 {[
-                                    { icon: <BookOpen className="w-3.5 h-3.5" />, label: "Kategori", value: course.category || course.specialty || "Genel" },
+                                    { icon: <BookOpen className="w-3.5 h-3.5" />, label: "Kategori", value: course.specialty || course.category || "Genel" },
                                     { icon: <Layers className="w-3.5 h-3.5" />, label: "Soru Sayısı", value: questions.length },
-                                    { icon: <Clock className="w-3.5 h-3.5" />, label: "Süre", value: "~45 dk" },
-                                    {
-                                        icon: <Video className="w-3.5 h-3.5" />,
-                                        label: "Tür",
-                                        value: course.isGeneral ? "Genel Eğitim" : "Özel Eğitim",
-                                        valueClass: course.isGeneral ? "text-blue-400" : "text-purple-400"
-                                    },
                                 ].map(item => (
                                     <div key={item.label} className="flex items-center justify-between text-xs py-2 border-b border-border last:border-0">
                                         <span className="flex items-center gap-2 text-muted-foreground">
                                             <span className="text-primary/60">{item.icon}</span>
                                             {item.label}
                                         </span>
-                                        <span className={`font-semibold text-foreground ${item.valueClass || ""}`}>
+                                        <span className="font-semibold text-foreground">
                                             {item.value}
                                         </span>
                                     </div>

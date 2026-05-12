@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Zap, BookOpen, Users, Star, PlusCircle, Edit3, Trash2, TrendingUp, Loader2, Mic, ChevronRight, Plus, X } from "lucide-react";
+import { Zap, BookOpen, Users, Star, PlusCircle, Edit3, Trash2, TrendingUp, Loader2, Mic, ChevronRight, Plus, X, Clock, ShieldAlert, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { courseAPI } from "@/services/api";
 import { useApp } from "@/contexts/AppContext";
@@ -19,6 +19,7 @@ export default function DashboardCreator() {
     const [location, navigate] = useLocation();
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isApproved, setIsApproved] = useState(true); // assume approved until proven otherwise
 
     // ── Course Modal ──────────────────────────────────────────────
     const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
@@ -42,8 +43,14 @@ export default function DashboardCreator() {
         try {
             const data = await courseAPI.getMyCourses();
             setCourses(data || []);
-        } catch {
-            toast.error("Eğitimler yüklenemedi");
+            setIsApproved(true);
+        } catch (err) {
+            // 403 = account not yet approved by admin
+            if (err?.response?.status === 403) {
+                setIsApproved(false);
+            } else {
+                toast.error("Eğitimler yüklenemedi");
+            }
         } finally {
             setLoading(false);
         }
@@ -156,10 +163,10 @@ export default function DashboardCreator() {
     const handleAddQuestion = () => {
         if (!newQuestionContent.trim()) return;
         const newQ = {
-            id: crypto.randomUUID(), // temporary ID for UI tracking
+            id: crypto.randomUUID(),
             content: newQuestionContent.trim(),
             orderIndex: courseForm.questions.length,
-            isNew: true // Flag to identify new questions during edit sync
+            isNew: true
         };
         setCourseForm(prev => ({
             ...prev,
@@ -175,12 +182,41 @@ export default function DashboardCreator() {
         }));
     };
 
-
-
     // ─────────────────────────────────────────────────────────────
     return (
         <DashboardLayout title="Eğitmen Paneli">
             <div className="p-6 space-y-6 animate-fade-in-up">
+
+                {/* ── Pending Approval Banner ──────────────────── */}
+                {!isApproved && (
+                    <div className="flex items-start gap-4 p-5 rounded-2xl bg-amber-50 border border-amber-200">
+                        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                            <Clock className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <h3 className="text-sm font-bold text-amber-800">Hesabınız Onay Bekliyor</h3>
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-700 uppercase tracking-wider">Beklemede</span>
+                            </div>
+                            <p className="text-xs text-amber-700/80 leading-relaxed mb-3">
+                                İçerik üretici hesabınız henüz bir yönetici tarafından onaylanmamış.
+                                Onay alındıktan sonra eğitim oluşturabilir, düzenleyebilir ve analiz sayfasına erişebilirsiniz.
+                            </p>
+                            <div className="flex flex-wrap gap-2 text-xs">
+                                <div className="flex items-center gap-1.5 text-amber-700 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200">
+                                    <ShieldAlert className="w-3.5 h-3.5" />
+                                    Eğitim oluşturma — <span className="font-semibold">Kilitli</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
+                                    <Mail className="w-3.5 h-3.5" />
+                                    Onay bildirimi e-posta ile gönderilecek
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -189,12 +225,17 @@ export default function DashboardCreator() {
                         </div>
                         <div>
                             <h2 className="text-lg font-bold text-foreground">Eğitmen Paneli</h2>
-                            <p className="text-xs text-muted-foreground">Eğitimlerinizi yönetin ve öğrenci etkileşimini takip edin</p>
+                            <p className="text-xs text-muted-foreground">Eğitimlerinizi yönetin ve öğrenci etkýleşimini takip edin</p>
                         </div>
                     </div>
-                    <Button onClick={() => openCourseModal()} className="btn-gradient text-xs h-9 px-4">
-                        <PlusCircle className="w-3.5 h-3.5 mr-2" />
-                        Yeni Eğitim
+                    <Button
+                        onClick={() => !isApproved ? toast.warning("Hesabınız onaylanmadan eğitim oluşturulamıyor. Lütfen yönetici onayını bekleyin.") : openCourseModal()}
+                        className={`text-xs h-9 px-4 ${isApproved ? "btn-gradient" : "bg-secondary border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 cursor-not-allowed"}`}
+                        title={!isApproved ? "Hesabınız henüz onaylanmadı" : undefined}
+                    >
+                        {isApproved
+                            ? <><PlusCircle className="w-3.5 h-3.5 mr-2" />Yeni Eğitim</>
+                            : <><Clock className="w-3.5 h-3.5 mr-2" />Onay Bekleniyor</>}
                     </Button>
                 </div>
 

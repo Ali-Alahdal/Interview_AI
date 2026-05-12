@@ -12,9 +12,10 @@ export function ThemeProvider({ children, defaultTheme = "light", switchable = f
         const root = document.documentElement;
         if (theme === "dark") {
             root.classList.add("dark");
-        }
-        else {
+        } else {
             root.classList.remove("dark");
+            // Ensure OS dark-mode preference doesn't override us
+            root.style.colorScheme = "light";
         }
         if (switchable) {
             localStorage.setItem("theme", theme);

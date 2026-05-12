@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 import { courseAttemptAPI } from "@/services/api";
-import { Loader2, Calendar, BookOpen, ChevronRight, Award } from "lucide-react";
+import { Loader2, Calendar, BookOpen, ChevronRight, Award, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Attempts() {
@@ -16,8 +16,8 @@ export default function Attempts() {
                 const data = await courseAttemptAPI.getMyAttempts();
                 setAttempts(data || []);
             } catch (error) {
-                console.error("Failed to fetch attempts:", error);
-                toast.error("Failed to load your attempts.");
+                console.error("Denemeler yüklenemedi:", error);
+                toast.error("Denemeleriniz yüklenemedi.");
             } finally {
                 setIsLoading(false);
             }
@@ -26,94 +26,109 @@ export default function Attempts() {
     }, []);
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
+        return new Date(dateString).toLocaleDateString("tr-TR", {
             year: "numeric", month: "short", day: "numeric",
             hour: "2-digit", minute: "2-digit"
         });
     };
 
-    const getScoreColor = (score) => {
-        if (score >= 80) return "text-emerald-600 bg-emerald-100";
-        if (score >= 60) return "text-amber-600 bg-amber-100";
-        return "text-red-600 bg-red-100";
+    const getScoreConfig = (score) => {
+        if (score >= 80) return { text: "text-emerald-400", bg: "bg-emerald-500/15 border-emerald-500/20", label: "Mükemmel" };
+        if (score >= 60) return { text: "text-amber-400", bg: "bg-amber-500/15 border-amber-500/20", label: "Yeterli" };
+        return { text: "text-red-400", bg: "bg-red-500/15 border-red-500/20", label: "Geliştirilmeli" };
     };
 
     if (isLoading) {
         return (
-            <DashboardLayout title="My Attempts">
-                <div className="flex justify-center items-center h-96">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <DashboardLayout title="Denemelerim">
+                <div className="flex flex-col justify-center items-center h-96 gap-4">
+                    <div className="w-12 h-12 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+                    <p className="text-sm text-muted-foreground">Denemeler yükleniyor...</p>
                 </div>
             </DashboardLayout>
         );
     }
 
     return (
-        <DashboardLayout title="My Attempts">
-            <div className="p-6 space-y-6 animate-fade-in-up max-w-5xl mx-auto">
-                <div className="flex items-center justify-between">
+        <DashboardLayout title="Denemelerim">
+            <div className="p-6 lg:p-8 space-y-6 animate-fade-in-up max-w-5xl mx-auto">
+
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                        <Trophy className="w-5 h-5 text-primary" />
+                    </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-foreground">Interview History</h2>
-                        <p className="text-muted-foreground mt-1 text-sm">Review your past performance and AI evaluations.</p>
+                        <h2 className="text-xl font-bold heading-font text-foreground">Mülakat Geçmişi</h2>
+                        <p className="text-muted-foreground text-sm">Geçmiş performansınızı ve yapay zeka değerlendirmelerini inceleyin.</p>
                     </div>
                 </div>
 
                 {attempts.length === 0 ? (
-                    <div className="glass-card flex flex-col items-center justify-center p-12 text-center border border-border rounded-xl">
-                        <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-                            <BookOpen className="w-8 h-8 text-muted-foreground" />
+                    <div className="glass-card flex flex-col items-center justify-center p-16 text-center border border-border rounded-2xl">
+                        <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mb-5 border border-border">
+                            <BookOpen className="w-9 h-9 text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground mb-2">No Attempts Yet</h3>
-                        <p className="text-muted-foreground mb-6 max-w-sm">
-                            You haven't completed any course interviews yet. Go to "My Courses" to start your first session.
+                        <h3 className="text-lg font-bold text-foreground mb-2">Henüz Deneme Yok</h3>
+                        <p className="text-muted-foreground mb-6 max-w-sm text-sm leading-relaxed">
+                            Henüz hiçbir eğitim mülakatını tamamlamadınız. İlk oturumunuzu başlatmak için Eğitimler bölümüne gidin.
                         </p>
-                        <button onClick={() => navigate("/courses")} className="btn-gradient px-6 py-2 rounded-lg">
-                            Browse Courses
+                        <button
+                            onClick={() => navigate("/courses")}
+                            className="btn-gradient px-7 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-primary/20"
+                        >
+                            Eğitimlere Göz At
                         </button>
                     </div>
                 ) : (
                     <div className="grid gap-4">
-                        {attempts.map((attempt) => (
-                            <div key={attempt.id} 
-                                 onClick={() => navigate(`/report/${attempt.id}`)}
-                                 className="glass-card rounded-xl p-5 border border-border hover:border-blue-500/50 transition-all cursor-pointer group flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                                <div className="flex items-start gap-4 flex-1 min-w-0">
-                                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                                        <BookOpen className="w-6 h-6 text-blue-500" />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <h3 className="text-base font-bold text-foreground truncate">
-                                            {attempt.course?.title || "Unknown Course"}
-                                        </h3>
-                                        <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-                                            <span className="flex items-center gap-1.5">
-                                                <Calendar className="w-3.5 h-3.5" />
-                                                {formatDate(attempt.completedAt || attempt.startedAt)}
-                                            </span>
-                                            {attempt.course?.specialty && (
-                                                <span className="px-2 py-0.5 rounded bg-secondary">
-                                                    {attempt.course.specialty}
+                        {attempts.map((attempt) => {
+                            const scoreConfig = getScoreConfig(attempt.totalScore);
+                            return (
+                                <div
+                                    key={attempt.id}
+                                    onClick={() => navigate(`/report/${attempt.id}`)}
+                                    className="glass-card rounded-2xl p-5 border border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200 cursor-pointer group flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+                                >
+                                    <div className="flex items-start gap-4 flex-1 min-w-0">
+                                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/10 group-hover:bg-primary/20 transition-colors">
+                                            <BookOpen className="w-5 h-5 text-primary" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <h3 className="text-base font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                                                {attempt.course?.title || "Bilinmeyen Eğitim"}
+                                            </h3>
+                                            <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                                                <span className="flex items-center gap-1.5 bg-secondary px-2 py-1 rounded-md">
+                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    {formatDate(attempt.completedAt || attempt.startedAt)}
                                                 </span>
-                                            )}
+                                                {attempt.course?.specialty && (
+                                                    <span className="px-2.5 py-1 rounded-md bg-secondary border border-border font-medium">
+                                                        {attempt.course.specialty}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                                        <div className="flex flex-col items-end flex-1 sm:flex-auto">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                                <Award className="w-3.5 h-3.5" />
+                                                <span>Genel Puan</span>
+                                            </div>
+                                            <div className={`font-black text-xl px-3 py-1 rounded-xl border ${scoreConfig.bg} ${scoreConfig.text}`}>
+                                                {attempt.totalScore} <span className="text-xs font-medium opacity-70">/ 100</span>
+                                            </div>
+                                        </div>
+                                        <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-200">
+                                            <ChevronRight className="w-4 h-4" />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-6 w-full sm:w-auto">
-                                    <div className="flex flex-col items-end flex-1 sm:flex-auto">
-                                        <div className="flex items-center gap-1.5">
-                                            <Award className="w-4 h-4 text-muted-foreground" />
-                                            <span className="text-xs font-medium text-muted-foreground">Overall Score</span>
-                                        </div>
-                                        <div className={`mt-1 font-bold text-lg px-2.5 py-0.5 rounded-lg ${getScoreColor(attempt.totalScore)}`}>
-                                            {attempt.totalScore} / 100
-                                        </div>
-                                    </div>
-                                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                        <ChevronRight className="w-4 h-4" />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

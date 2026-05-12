@@ -16,8 +16,8 @@ export default function Analytics() {
     const { user } = useApp();
     const isAdmin = user?.role == "0" || user?.role == "1" || user?.role === "admin" || user?.role === "super_admin";
 
-    const filters = isAdmin ? ["Platform", ...COURSE_CATEGORIES] : ["My Content", ...COURSE_CATEGORIES];
-    const [activeFilter, setActiveFilter] = useState(isAdmin ? "Platform" : "My Content");
+    const filters = isAdmin ? ["Platform", ...COURSE_CATEGORIES] : ["İçeriklerim", ...COURSE_CATEGORIES];
+    const [activeFilter, setActiveFilter] = useState(isAdmin ? "Platform" : "İçeriklerim");
     
     const [rawData, setRawData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function Analytics() {
     }, [isAdmin]);
 
     const filteredData = useMemo(() => {
-        if (activeFilter === "Platform" || activeFilter === "My Content") return rawData;
+        if (activeFilter === "Platform" || activeFilter === "İçeriklerim") return rawData;
         return rawData.filter(c => c.category === activeFilter || c.specialty === activeFilter);
     }, [rawData, activeFilter]);
 
@@ -56,7 +56,7 @@ export default function Analytics() {
             }
         });
         
-        const labels = ["5 Wks Ago", "4 Wks Ago", "3 Wks Ago", "2 Wks Ago", "Last Wk", "This Wk"];
+        const labels = ["5 Hf. Önce", "4 Hf. Önce", "3 Hf. Önce", "2 Hf. Önce", "Geçen Hf.", "Bu Hf."];
         const data = [];
         for (let i = 5; i >= 0; i--) {
             data.push({
@@ -77,7 +77,7 @@ export default function Analytics() {
 
     // 2. Engagement Data: Questions per course for the top recent courses
     const engagementData = useMemo(() => {
-        if (filteredData.length === 0) return [{ name: 'No Data', questions: 0, target: 0 }];
+        if (filteredData.length === 0) return [{ name: 'Veri Yok', questions: 0, target: 0 }];
         return filteredData.slice(0, 7).map(c => ({
             name: (c.title || "Course").substring(0, 10) + "..",
             questions: c.questions?.length || 0,
@@ -99,7 +99,7 @@ export default function Analytics() {
             name: k.substring(0, 10),
             score: Math.round((catMap[k].totalQs / catMap[k].count) * 20) || Math.floor(Math.random() * 15) + 70
         }));
-        return res.length > 0 ? res : [{ name: 'N/A', score: 0 }];
+        return res.length > 0 ? res : [{ name: 'Veri Yok', score: 0 }];
     }, [filteredData]);
 
     // 4. Distribution Data: Courses per category
@@ -110,22 +110,22 @@ export default function Analytics() {
             catMap[cat] = (catMap[cat] || 0) + 1;
         });
         const res = Object.keys(catMap).map(k => ({ name: k, value: catMap[k] }));
-        return res.length > 0 ? res : [{ name: 'Empty', value: 1 }];
+        return res.length > 0 ? res : [{ name: 'Boş', value: 1 }];
     }, [filteredData]);
 
     return (
-        <DashboardLayout title="Analytics & Insights">
+        <DashboardLayout title="Analizler">
             <div className="p-6 space-y-6 animate-fade-in-up">
                 
-                {/* Header & Description */}
+                {/* Header */}
                 <div className="flex flex-col mb-4">
-                    <h2 className="text-xl font-bold text-foreground">
-                        {isAdmin ? "Platform Analytics" : "Creator Analytics"}
+                    <h2 className="text-xl font-bold heading-font text-foreground">
+                        {isAdmin ? "Platform Analizleri" : "İçerik Analizleri"}
                     </h2>
                     <p className="text-sm text-muted-foreground">
                         {isAdmin 
-                            ? "Monitor platform growth, user engagement, and performance statistics." 
-                            : "Track your course enrollments, student performance, and engagement."}
+                            ? "Platform büyümesini, kullanıcı katılımını ve performans istatistiklerini izleyin." 
+                            : "Kurs kayıtlarınızı, öğrenci performansını ve katılımı takip edin."}
                     </p>
                 </div>
 
@@ -135,13 +135,13 @@ export default function Analytics() {
                         <button
                             key={filter}
                             onClick={() => setActiveFilter(filter)}
-                            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
                                 activeFilter === filter 
-                                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" 
-                                    : "bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
+                                    ? "bg-primary text-white shadow-md shadow-primary/20" 
+                                    : "glass-card text-muted-foreground hover:text-foreground border border-border"
                             }`}
                         >
-                            {filter === "Platform" ? "All Platform" : filter === "My Content" ? "All My Courses" : filter}
+                            {filter === "Platform" ? "Tüm Platform" : filter === "İçeriklerim" ? "Tüm İçeriklerim" : filter}
                         </button>
                     ))}
                 </div>
@@ -152,8 +152,8 @@ export default function Analytics() {
                     {/* 1. Growth (LineChart) */}
                     <div className="glass-card p-5 rounded-xl border border-border">
                         <h3 className="text-sm font-semibold mb-4 flex justify-between items-center">
-                            {isAdmin ? "Platform Growth (Courses)" : "Content Growth"}
-                            {loading && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
+                            {isAdmin ? "Platform Büyümesi (Eğitimler)" : "İçerik Büyümesi"}
+                            {loading && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
                         </h3>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
@@ -166,8 +166,8 @@ export default function Analytics() {
                                         itemStyle={{ color: 'hsl(var(--foreground))' }}
                                     />
                                     <Legend wrapperStyle={{ fontSize: '12px' }}/>
-                                    <Line type="monotone" dataKey="count" name={isAdmin ? "Actual Courses" : "My Courses"} stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                                    <Line type="monotone" dataKey="target" name={isAdmin ? "Target" : "Expected"} stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                                    <Line type="monotone" dataKey="count" name={isAdmin ? "Mevcut Eğitimler" : "Eğitimlerim"} stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                                    <Line type="monotone" dataKey="target" name={isAdmin ? "Hedef" : "Beklenen"} stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 5" dot={false} />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
@@ -176,7 +176,7 @@ export default function Analytics() {
                     {/* 2. Engagement (AreaChart) */}
                     <div className="glass-card p-5 rounded-xl border border-border">
                         <h3 className="text-sm font-semibold mb-4">
-                            {isAdmin ? "Content Volume (Questions per Course)" : "Course Questions Volume"}
+                            {isAdmin ? "İçerik Hacmi (Kurs Başına Soru)" : "Kurs Soruları Hacmi"}
                         </h3>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
@@ -199,8 +199,8 @@ export default function Analytics() {
                                         itemStyle={{ color: 'hsl(var(--foreground))' }}
                                     />
                                     <Legend wrapperStyle={{ fontSize: '12px' }}/>
-                                    <Area type="monotone" dataKey="questions" name="Questions" stroke="#10b981" fillOpacity={1} fill="url(#colorActive)" />
-                                    <Area type="monotone" dataKey="target" name="Target" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorCompletions)" />
+                                    <Area type="monotone" dataKey="questions" name="Sorular" stroke="#10b981" fillOpacity={1} fill="url(#colorActive)" />
+                                    <Area type="monotone" dataKey="target" name="Hedef" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorCompletions)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -209,21 +209,21 @@ export default function Analytics() {
                     {/* 3. Performance (BarChart) */}
                     <div className="glass-card p-5 rounded-xl border border-border">
                         <h3 className="text-sm font-semibold mb-4">
-                            {activeFilter === "Platform" || activeFilter === "My Content" 
-                                ? "Content Quality Score (by Category)" 
-                                : "Skill Assessment Scores"}
+                            {activeFilter === "Platform" || activeFilter === "İçeriklerim" 
+                                ? "İçerik Kalite Skoru (Kategoriye Göre)" 
+                                : "Beceri Değerlendirme Skorları"}
                         </h3>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={performanceData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-10" vertical={false} />
-                                    <XAxis dataKey={activeFilter === "Platform" || activeFilter === "My Content" ? "name" : "metric"} stroke="currentColor" className="opacity-50 text-xs" />
+                                    <XAxis dataKey={activeFilter === "Platform" || activeFilter === "İçeriklerim" ? "name" : "metric"} stroke="currentColor" className="opacity-50 text-xs" />
                                     <YAxis stroke="currentColor" className="opacity-50 text-xs" domain={[0, 100]} />
                                     <Tooltip 
                                         cursor={{ fill: 'currentColor', opacity: 0.05 }}
                                         contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
                                     />
-                                    <Bar dataKey="score" name="Avg Score (%)" radius={[4, 4, 0, 0]}>
+                                    <Bar dataKey="score" name="Ort. Skor (%)" radius={[4, 4, 0, 0]}>
                                         {performanceData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                                         ))}
@@ -236,7 +236,7 @@ export default function Analytics() {
                     {/* 4. Distribution (PieChart) */}
                     <div className="glass-card p-5 rounded-xl border border-border">
                         <h3 className="text-sm font-semibold mb-4">
-                            {isAdmin ? "Platform Content Distribution" : "My Content Distribution"}
+                            {isAdmin ? "Platform İçerik Dağılımı" : "Kendi İçerik Dağılımım"}
                         </h3>
                         <div className="h-[300px] w-full flex items-center justify-center">
                             <ResponsiveContainer width="100%" height="100%">

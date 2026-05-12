@@ -9,7 +9,7 @@ import { courseAPI } from "@/services/api";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Play, Clock, BookOpen, ChevronRight, Layers, Star, Users, Filter, Sparkles } from "lucide-react";
+import { Search, Play, BookOpen, ChevronRight, Layers, Filter, Sparkles } from "lucide-react";
 import { getYouTubeThumbnail } from "@/utils/helpers";
 import { COURSE_CATEGORIES } from "@/utils/categories";
 
@@ -65,49 +65,35 @@ function CourseCard({ course, onSelect }) {
             </div>
 
             {/* Content */}
-            <div className="p-5 flex flex-col flex-1 bg-sidebar/20">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded-md">
-                        {course.specialty || "Genel Hazırlık"}
-                    </span>
-                    <div className="flex items-center text-amber-500 text-xs font-bold">
-                        <Star className="w-3.5 h-3.5 fill-current mr-1" />
-                        4.8
-                    </div>
-                </div>
+            <div className="p-5 flex flex-col flex-1">
+                <span className="text-[11px] font-bold text-primary uppercase tracking-wider mb-2 block">
+                    {course.specialty || "Genel Hazırlık"}
+                </span>
 
-                <h3 className="text-sm font-bold text-foreground mb-1.5 line-clamp-2 group-hover:text-primary transition-colors">
+                <h3 className="text-sm font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-primary transition-colors">
                     {course.title}
                 </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4 line-clamp-2 flex-1">
+                <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-2 flex-1">
                     {course.description || "Açıklama bulunmuyor."}
                 </p>
 
                 {/* Meta */}
-                <div className="flex items-center justify-between pt-3 border-t border-border">
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1 bg-secondary px-2 py-1 rounded-md">
-                            <Layers className="w-3 h-3" />{course.questionsCount || (course.questions?.length || 0)} Soru
-                        </span>
-                        <span className="flex items-center gap-1 bg-secondary px-2 py-1 rounded-md">
-                            <Clock className="w-3 h-3" />~45 dk
-                        </span>
-                    </div>
-                    {course.completionRate !== undefined && course.completionRate > 0
-                        ? <span className="text-xs text-emerald-400 font-semibold">{course.completionRate}% tamamlandı</span>
-                        : <span className="text-xs text-muted-foreground">Başlanmadı</span>
-                    }
+                <div className="flex items-center gap-2 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
+                        <Layers className="w-3 h-3 text-primary" />
+                        {course.questionsCount || (course.questions?.length ?? 0)} Soru
+                    </span>
                 </div>
             </div>
 
             {/* Start Button */}
             <div className="px-5 pb-5">
                 <Button
-                    className="w-full btn-gradient text-xs font-bold h-9 group-hover:shadow-md group-hover:shadow-primary/20 transition-all"
+                    className="w-full btn-gradient text-xs font-bold h-9"
                     onClick={e => { e.stopPropagation(); onSelect(course); }}
                 >
-                    {course.completionRate && course.completionRate > 0 ? "Devam Et" : "Eğitime Başla"}
-                    <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                    Eğitime Başla
+                    <ChevronRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
             </div>
         </div>
@@ -177,12 +163,6 @@ export default function Courses() {
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5 bg-secondary px-3 py-1.5 rounded-full">
                             <BookOpen className="w-3.5 h-3.5 text-primary" />{filtered.length} eğitim
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-secondary px-3 py-1.5 rounded-full">
-                            <Users className="w-3.5 h-3.5 text-emerald-400" />50K+ öğrenci
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-secondary px-3 py-1.5 rounded-full">
-                            <Star className="w-3.5 h-3.5 text-amber-400 fill-current" />4.8 ortalama puan
                         </span>
                     </div>
                 </div>

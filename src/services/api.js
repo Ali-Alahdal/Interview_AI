@@ -54,7 +54,7 @@ api.interceptors.response.use(
     }
     // Handle permissions errors
     else if (status === 403) {
-      toast.error("You don't have permission to perform this action.");
+      toast.error("Bu işlemi gerçekleştirmek için yetkiniz bulunmuyor. Hesabınız henüz onaylanmamış olabilir.");
     }
     // Provide generic toast for server errors if desired (can be turned off)
     else if (status >= 500) {
