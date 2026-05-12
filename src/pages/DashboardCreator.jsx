@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Zap, BookOpen, Users, Star, PlusCircle, Edit3, Trash2, TrendingUp, Loader2, Mic, ChevronRight, Plus, X, Clock, ShieldAlert, Mail } from "lucide-react";
+import { Zap, BookOpen, PlusCircle, Edit3, Trash2, Loader2, Mic, Clock, ShieldAlert, Mail, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { courseAPI } from "@/services/api";
 import { useApp } from "@/contexts/AppContext";
@@ -240,22 +240,33 @@ export default function DashboardCreator() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     {[
-                        { label: "Toplam Öğrenci", value: "-", icon: <Users className="w-5 h-5" />, color: "text-blue-600", bg: "bg-blue-500/10" },
-                        { label: "Yayınlanan Eğitimler", value: loading ? "-" : courses.length, icon: <BookOpen className="w-5 h-5" />, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-                        { label: "Ort. Puan", value: "-", icon: <Star className="w-5 h-5" />, color: "text-amber-400", bg: "bg-amber-500/10" },
-                        { label: "Tamamlama Oranı", value: "-", icon: <TrendingUp className="w-5 h-5" />, color: "text-cyan-400", bg: "bg-cyan-500/10" },
+                        {
+                            label: "Yayınlanan Eğitimler",
+                            value: loading ? "..." : courses.length,
+                            icon: <BookOpen className="w-5 h-5" />,
+                            color: "text-emerald-600",
+                            bg: "bg-emerald-50 border border-emerald-100"
+                        },
+                        {
+                            label: "Toplam Soru",
+                            value: loading ? "..." : courses.reduce((sum, c) => sum + (c.questions?.length ?? c.questionsCount ?? 0), 0),
+                            icon: <Mic className="w-5 h-5" />,
+                            color: "text-indigo-600",
+                            bg: "bg-indigo-50 border border-indigo-100"
+                        },
                     ].map(stat => (
-                        <div key={stat.label} className="glass-card rounded-xl p-4 glow-border">
+                        <div key={stat.label} className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                             <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center mb-3 ${stat.color}`}>
                                 {stat.icon}
                             </div>
-                            <div className="text-2xl font-bold text-foreground mb-0.5">{stat.value}</div>
-                            <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
+                            <div className="text-2xl font-bold text-gray-900 mb-0.5">{stat.value}</div>
+                            <div className="text-xs font-medium text-gray-500">{stat.label}</div>
                         </div>
                     ))}
                 </div>
+
 
                 {/* My Courses */}
                 <div className="glass-card rounded-xl border border-border overflow-hidden">

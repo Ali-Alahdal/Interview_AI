@@ -9,7 +9,7 @@ import { courseAttemptAPI } from "@/services/api";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
-    ChevronDown, ChevronUp, RotateCcw, BookOpen, Loader2,
+    ChevronDown, ChevronUp, ChevronRight, RotateCcw, BookOpen, Loader2,
     Trophy, TrendingUp, AlertTriangle, Lightbulb, CheckCircle, Star
 } from "lucide-react";
 
